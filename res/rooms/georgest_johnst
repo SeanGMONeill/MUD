@@ -1,0 +1,11 @@
+{
+  "roomID": "georgest_johnst",
+  "roomName": "George Street/John Street",
+  "roomDescription": "",
+  "north": "",
+  "south": "merchant_city",
+  "east": "",
+  "west": "",
+  "up": "",
+  "down": ""
+}

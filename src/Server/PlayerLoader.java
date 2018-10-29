@@ -10,7 +10,7 @@ import javax.json.JsonReader;
 
 public class PlayerLoader {
 
-	public static Player loadPlayer(String name, Map map) throws NoSuchPlayerException, CorruptFileException {
+	public static Player loadPlayer(String name, Server server) throws NoSuchPlayerException, CorruptFileException {
 		name = name.toLowerCase();
 		File file = new File("res/players/"+name+".json");
 		if(!file.exists()) {
@@ -30,22 +30,30 @@ public class PlayerLoader {
 		
 		
 		String playerName;
-		int playerX;
-		int playerY;
+		String currentRoomID;
 		
 		try {
 			playerName = playerObject.getString("name");
-			playerX = playerObject.getInt("posX");
-			playerY = playerObject.getInt("posY");
+			currentRoomID = playerObject.getString("currentRoomID");
 		}
 		catch(NullPointerException e) {
 			throw new CorruptFileException();
 		}
 		
 		
-		Position playerPos = new Position(playerX, playerY);
+		Room currentRoom;
 		
-		return new Player(playerName, playerPos, map);
+		try {
+			currentRoom = server.getRoomByID(currentRoomID);
+		}
+		catch(InvalidRoomException e) {
+			Server.logError("Player file of: " + playerName + " claims they are in room: " + currentRoomID + ", which doesn't exist.");
+			throw new CorruptFileException();
+		}
+		
+		return new Player(playerName, currentRoom, server);
+		
+		
 	}
 
 

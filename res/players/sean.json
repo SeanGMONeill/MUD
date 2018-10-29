@@ -1,5 +1,4 @@
 {
   "name": "Sean",
-  "posX": 10,
-  "posY": 24
+  "currentRoomID": "spawn"
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -52,29 +53,37 @@ public class ClientConnection implements Runnable {
 		
 		out.println("Please tell me your player name");
 		
-		String input = getInput();
+		String input = promptPlayerName();
 		
+		if(input == null) {
+			//Abort thread, we've already disconnected the user.
+			return;
+		}
 		
 		
 		console("Name: " + input);
 			
 		while(player == null) {
 			try {
-				player = PlayerLoader.loadPlayer(input, null);
+				player = PlayerLoader.loadPlayer(input, server);
 			}
 			catch(NoSuchPlayerException e) {
 				out.println("Invalid player name, please try again:");
-				input = getInput();
+				input = getLoopingInput();
+				if(input != null) {
+					handleCommand(input);
+				}
 			}
 			catch(CorruptFileException e) {
 				out.println("Your player record is damaged. Please contact a developer.");
 				try {
 					console("Corrupt player file. Exiting.");
 					socket.close();
+					Server.logError("Corrupt player file for: " + input);
 					return;
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					Server.logError(e1);
 				}
 			}
 		}
@@ -93,23 +102,31 @@ public class ClientConnection implements Runnable {
 		
 		
 		server.setOnline(player.getName(), this);
-		out.println("Loaded player " + player.getName() + " at co-ordinates [" + player.getPosition().getX() + ", " + player.getPosition().getY() + "]");
+		out.println("Loaded player " + player.getName() + " at " + player.getRoom().getName());
+		player.getRoom().enterRoom(player);
 		console("Loaded player.");
 		
-		
+		try {
+			//Setting timeout to 500ms, because we are not looping to handle timeouts intentionally, for asynchronous comms.
+			socket.setSoTimeout(500);
+		} catch (SocketException e) {
+			Server.logError(e);
+		}
 		
 		while(!socket.isClosed()) {
 			//Do game stuff
-			input = getInput();
-			sendStuffToClient();
+			input = getLoopingInput();
 			
 			if(input != null) {
-				//console(input);
+				handleCommand(input);
 			}
+			
+			sendStuffToClient();
 		}
 		
 		if(player != null) {
 			server.setOffline(player.getName());
+			player.getRoom().leaveRoom(player);
 			console("Player disconnected.");
 		}
 		return; //Return to kill the thread, because the connection is closed.
@@ -124,7 +141,7 @@ public class ClientConnection implements Runnable {
 		System.out.println(Thread.currentThread().getId() + "["+ playerName +"]> " + text);
 	}
 	
-	private String getInput() {
+	private String getLoopingInput() {
 		String input;
 				
 		
@@ -137,7 +154,7 @@ public class ClientConnection implements Runnable {
 					socket.close();
 					return null;
 				} catch (IOException e1) {
-					console("Oopsie.");
+					Server.logError(e1);
 				}
 			}
 			
@@ -148,7 +165,44 @@ public class ClientConnection implements Runnable {
 			//This is just to give us a wee chance to send stuff to the client, because readLine() is a blocking method.
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			Server.logError(e);
+		}
+		
+		return null;
+	}
+	
+	private String promptPlayerName() {
+		String input;
+				
+		
+		try {
+			input = in.readLine();
+			
+			if(input == null) {
+				//console("Client timed out.");
+				try {
+					socket.close();
+					return null;
+				} catch (IOException e1) {
+					Server.logError(e1);
+				}
+			}
+			
+			
+			return input;
+		} 
+		catch(SocketTimeoutException e) {
+			out.println("Timed out. Please enter a player name within 60 seconds next time.");
+			try {
+				socket.close();
+			} catch (IOException e1) {
+				Server.logError(e1);
+			}
+			return null;
+			
+		}
+		catch (IOException e) {
+			Server.logError(e);
 		}
 		
 		return null;
@@ -161,8 +215,63 @@ public class ClientConnection implements Runnable {
 		}
 	}
 	
-	public void queueMessage(String message) {
+	public synchronized void queueMessage(String message) {
 		waitingMessages.add(message);
+	}
+	
+	private void handleCommand(String input) {
+		String[] splitInput = input.split(" ", 2);
+		String command;
+		String param = ""; 
+		
+		command = splitInput[0].toLowerCase();
+		if(splitInput.length>1) {
+			param = splitInput[1];
+		}
+		
+		switch(command) {
+			case "shout":
+				player.shout(param);
+				break;
+			case "say":
+				player.say(param);
+				break;
+			case "north":
+			case "n":
+				player.move(Position.Direction.NORTH);
+				break;
+			case "south":
+			case "s":
+				player.move(Position.Direction.SOUTH);
+				break;
+			case "east":
+			case "e":
+				player.move(Position.Direction.EAST);
+				break;
+			case "west":
+			case "w":
+				player.move(Position.Direction.WEST);
+				break;
+			case "up":
+			case "u":
+				player.move(Position.Direction.UP);
+				break;
+			case "down":
+			case "d":
+				player.move(Position.Direction.DOWN);
+				break;
+			case "look":
+				server.messagePlayer(player, player.getRoom().toLongString());
+				break;
+			case "exit":
+				server.messagePlayer(player, "Thanks for playing!");
+				try { socket.close(); }catch(Exception e) {Server.logError(e);}
+				break;
+				
+			default:
+				out.println("No such command.");
+		}
+		
 	}
 	
 }

@@ -1,0 +1,11 @@
+{
+  "roomID": "merchant_city",
+  "roomName": "Merchant City",
+  "roomDescription": "Along the cobbled streets are various restaurants, not currently open. To the North, beyond the City Chambers' arch, is the intersection of George Street with John Street.",
+  "north": "georgest_johnst",
+  "south": "spawn",
+  "east": "",
+  "west": "",
+  "up": "",
+  "down": ""
+}

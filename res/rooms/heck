@@ -1,0 +1,11 @@
+{
+  "roomID": "heck",
+  "roomName": "Heck",
+  "roomDescription": "A horrific chamber of heat, everything in this room is aflame, other than the ladder you are on.",
+  "north": "",
+  "south": "",
+  "east": "",
+  "west": "",
+  "up": "spawn",
+  "down": ""
+}

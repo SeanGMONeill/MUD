@@ -1,0 +1,11 @@
+{
+  "roomID": "spawn",
+  "roomName": "Spawn Area",
+  "roomDescription": "A wide, open room. Natural light from the skylight makes the surprisingly warm marble floor glisten.",
+  "north": "merchant_city",
+  "south": "",
+  "east": "",
+  "west": "",
+  "up": "",
+  "down": "heck"
+}

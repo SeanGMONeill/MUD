@@ -4,39 +4,57 @@ import Server.Position.Direction;
 
 public class Player {
 
-	Map map;
 	
 	private String name;
 	
-	private Position position;
+	private Server server;
+	
+	private Room currentRoom;
 	
 	
-	public Player(String name, Position position, Map map) {
+	public Player(String name, Room currentRoom, Server server) {
 		this.name = name;
-		this.position = position;
-		this.map = map;
+		this.currentRoom = currentRoom;
+		this.server = server;
+		
 	}
 	
-	public boolean move(Direction direction) {
-		
-		Position newPos = position.copy();
-		newPos.move(direction);
-		
-		if(map.isValidPosition(newPos)) {
-			position = newPos;
-			return true;
+	public void move(Direction direction) {
+		if(currentRoom.canGo(direction)) {
+			currentRoom.leaveRoom(this);
+			try {
+				currentRoom = currentRoom.getRoom(direction);
+			}
+			catch(Exception e) {
+				Server.logError(e);
+			}
+			currentRoom.enterRoom(this);
 		}
 		else {
-			return false;
+			server.messagePlayer(this, "You cannot move in this direction.");
 		}
-		
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
-	public Position getPosition() {
-		return position;
+	public Room getRoom() {
+		return currentRoom;
 	}
+	
+	//Say to current room
+	public void say(String message) {
+		if(message != null && message.length()>0){
+			currentRoom.messageAllPlayers(name + " says: " + message);
+		}
+	}
+	
+	//Shout to the world!
+	public void shout(String message) {
+		if(message != null && message.length()>0) {
+			server.messageAllPlayers(name + " shouts: " + message);
+		}
+	}
+	
 }
