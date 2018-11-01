@@ -1,0 +1,11 @@
+{
+"roomID" : "erm",
+"roomName" : "erm",
+"roomDescription" : "You can't quite pin down what this place reminds you of, it's vaguely beige.",
+  "north": "",
+  "south": "",
+  "east": "",
+  "west": "",
+  "up": "",
+  "down": "spawn"
+}

@@ -28,4 +28,14 @@
   		<version>1.1</version>
   	</dependency>
   </dependencies>
+  
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>corp1</id>
+      <name>MiniMUD</name>
+      <url></url>
+      <layout>default</layout>
+    </repository>
+</distributionManagement>
 </project>
