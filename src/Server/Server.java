@@ -33,7 +33,7 @@ public class Server {
 		
 		//This is the actual socket we're listening on
 		ServerSocket serverSocket = new ServerSocket(port);
-		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownThread(serverSocket)));
+		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownThread(serverSocket, onlinePlayers)));
 		
 		//Keeps track of active players and connections
 		connections = new ThreadGroup("Connections");

@@ -219,6 +219,11 @@ public class ClientConnection implements Runnable {
 		waitingMessages.add(message);
 	}
 	
+	public void exitPlayer(String message) {
+		server.messagePlayer(player, message);
+		try { socket.close(); }catch(Exception e) {Server.logError(e);}
+	}
+	
 	private void handleCommand(String input) {
 		String[] splitInput = input.split(" ", 2);
 		String command;
@@ -264,8 +269,7 @@ public class ClientConnection implements Runnable {
 				server.messagePlayer(player, player.getRoom().toLongString());
 				break;
 			case "exit":
-				server.messagePlayer(player, "Thanks for playing!");
-				try { socket.close(); }catch(Exception e) {Server.logError(e);}
+				exitPlayer("Thanks for playing!");
 				break;
 				
 			default:
