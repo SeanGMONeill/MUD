@@ -116,34 +116,30 @@ public class Room {
 			exitString = "nowhere";
 		}
 		else {
-			for(int i = 0; i < directions.size(); i++) {
-				exitString = exitString + directions.get(i).toString();
-				if(i == directions.size()-2) {
-					if(directions.size() == 2) {
-						exitString = exitString + " or ";
-					}
-					else if(directions.size() > 2) {
-						exitString = exitString + ", or ";
-					}
-				}
-				else if(i != directions.size()-1) {
-					exitString = exitString + ", ";
-				}
+			List<String> dirsToStrings = new ArrayList<>();
+			for(Position.Direction direction : directions) {
+				dirsToStrings.add(direction.toString());
 			}
+			exitString = TextUtils.listToEnglish(dirsToStrings, "or");
 		}
 		
 		return exitString;
 	}
 	
 	public void enterRoom(Player player) {
+		messageAllPlayers(player.getName() + " has wandered here.");
 		players.add(player);
 		server.messagePlayer(player, toShortString());
+		server.messagePlayer(player, playersToString());
 	}
 	
 	public void leaveRoom(Player player) {
 		players.remove(player);
 		if(players.isEmpty()) {
 			saveRoomState();
+		}
+		else {
+			messageAllPlayers(player.getName() + " has wandered away.");
 		}
 	}
 	
@@ -154,6 +150,22 @@ public class Room {
 	public void messageAllPlayers(String message) {
 		for(Player player : getPlayers()) {
 			server.messagePlayer(player, message);
+		}
+	}
+	
+	private String playersToString() {
+		if(players.size()==0) {
+			return "Nobody else is here.";
+		}
+		else if(players.size()==1) {
+			return ((Player)players.toArray()[0]).getName() + " is here.";
+		}
+		else {
+			List<String> playerNames = new ArrayList<>();
+			for(Player player : players) {
+				playerNames.add(player.getName());
+			}
+			return TextUtils.listToEnglish(playerNames, "and") + " are here.";
 		}
 	}
 	
