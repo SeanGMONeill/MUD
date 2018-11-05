@@ -51,6 +51,8 @@ public class ClientConnection implements Runnable {
 		out.println("_\\ \\  __/ (_| | | | / /\\/\\ \\ \\_/ / /_// ");
 		out.println("\\__/\\___|\\__,_|_| |_\\/    \\/\\___/___,'  ");
 		
+		out.println("\033[31;1;4mHello\033[0m");
+		
 		out.println("Please tell me your player name");
 		
 		String input = promptPlayerName();
