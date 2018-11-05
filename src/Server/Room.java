@@ -127,10 +127,10 @@ public class Room {
 	}
 	
 	public void enterRoom(Player player) {
-		messageAllPlayers(player.getName() + " has wandered here.");
+		server.messagePlayer(player, playersToString());
+		messageAllPlayers(player.getName() + " has wandered over.");
 		players.add(player);
 		server.messagePlayer(player, toShortString());
-		server.messagePlayer(player, playersToString());
 	}
 	
 	public void leaveRoom(Player player) {
@@ -139,7 +139,7 @@ public class Room {
 			saveRoomState();
 		}
 		else {
-			messageAllPlayers(player.getName() + " has wandered away.");
+			messageAllPlayers(player.getName() + " sauntered away.");
 		}
 	}
 	
