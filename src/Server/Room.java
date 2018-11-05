@@ -142,6 +142,9 @@ public class Room {
 	
 	public void leaveRoom(Player player) {
 		players.remove(player);
+		if(players.isEmpty()) {
+			saveRoomState();
+		}
 	}
 	
 	public List<Player> getPlayers(){
@@ -152,5 +155,9 @@ public class Room {
 		for(Player player : getPlayers()) {
 			server.messagePlayer(player, message);
 		}
+	}
+	
+	private void saveRoomState() {
+		
 	}
 }

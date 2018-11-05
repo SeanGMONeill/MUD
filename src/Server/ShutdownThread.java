@@ -26,7 +26,7 @@ public class ShutdownThread implements Runnable{
 			System.out.println(">>Disconnected all<<");
 		}
 		catch(IOException e) {
-			e.printStackTrace();
+			Server.logError(e);
 		}
 	}
 

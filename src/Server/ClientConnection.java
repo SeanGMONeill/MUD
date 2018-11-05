@@ -97,7 +97,7 @@ public class ClientConnection implements Runnable {
 				socket.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Server.logError(e);
 			}
 			return;
 		}
@@ -129,6 +129,7 @@ public class ClientConnection implements Runnable {
 		if(player != null) {
 			server.setOffline(player.getName());
 			player.getRoom().leaveRoom(player);
+			PlayerSaver.savePlayer(player);
 			console("Player disconnected.");
 		}
 		return; //Return to kill the thread, because the connection is closed.

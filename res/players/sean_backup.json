@@ -1,0 +1,8 @@
+{
+  "name": "Sean",
+  "currentRoomID": "spawn",
+  "inventory": [ 
+  	{"name": "Fish of Slapping", "shorthand": "fish", "attributes": ["meleeWeapon", "putrid"]},
+  	{"name": "Screwdriver", "shorthand": "screwdriver", "attributes":["stabbingWeapon", "unscrewsThings"]}
+  	]
+}
