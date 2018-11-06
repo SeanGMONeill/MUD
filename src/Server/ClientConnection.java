@@ -65,40 +65,12 @@ public class ClientConnection implements Runnable {
 		
 		console("Name: " + input);
 			
-		while(player == null) {
-			try {
-				player = PlayerLoader.loadPlayer(input, server);
-			}
-			catch(NoSuchPlayerException e) {
-				out.println("Invalid player name, please try again:");
-				input = getLoopingInput();
-				if(input != null) {
-					handleCommand(input);
-				}
-			}
-			catch(CorruptFileException e) {
-				out.println("Your player record is damaged. Please contact a developer.");
-				try {
-					console("Corrupt player file. Exiting.");
-					socket.close();
-					Server.logError("Corrupt player file for: " + input);
-					return;
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					Server.logError(e1);
-				}
-			}
+		if(tryLoadPlayer(input) == true) {
+			
 		}
-		
-		if(server.isOnline(input)) {
-			out.println(input + " is already connected. Disconnecting this session.");
-			console(input + " already connected.");
-			try {
-				socket.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				Server.logError(e);
-			}
+		else
+		{
+			//False return means tryLoadPlayer found some issue, and wants to disconnect the user.
 			return;
 		}
 		
@@ -134,6 +106,47 @@ public class ClientConnection implements Runnable {
 		}
 		return; //Return to kill the thread, because the connection is closed.
 		
+	}
+
+	private boolean tryLoadPlayer(String playerName) {
+		while(player == null) {
+			try {
+				player = PlayerLoader.loadPlayer(playerName, server);
+			}
+			catch(NoSuchPlayerException e) {
+				out.println("Invalid player name, please try again:");
+				playerName = getLoopingInput();
+				if(playerName != null) {
+					handleCommand(playerName);
+				}
+			}
+			catch(CorruptFileException e) {
+				out.println("Your player record is damaged. Please contact a developer.");
+				try {
+					console("Corrupt player file. Exiting.");
+					socket.close();
+					Server.logError("Corrupt player file for: " + playerName);
+					return false;
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					Server.logError(e1);
+				}
+			}
+		}
+		
+		if(server.isOnline(playerName)) {
+			out.println(playerName + " is already connected. Disconnecting this session.");
+			console(playerName + " already connected.");
+			try {
+				socket.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				Server.logError(e);
+			}
+			return false;
+		}
+		
+		return true; //Success
 	}
 	
 	private void console(String text) {
@@ -244,6 +257,10 @@ public class ClientConnection implements Runnable {
 			case "say":
 				player.say(param);
 				break;
+			case "emote":
+			case "me":
+				player.emote(param);
+				break;
 			case "north":
 			case "n":
 				player.move(Position.Direction.NORTH);
@@ -269,6 +286,7 @@ public class ClientConnection implements Runnable {
 				player.move(Position.Direction.DOWN);
 				break;
 			case "look":
+			case "l":
 				server.messagePlayer(player, player.getRoom().toLongString());
 				break;
 			case "exit":
