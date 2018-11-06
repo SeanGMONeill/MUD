@@ -60,7 +60,7 @@ public class Player {
 	//Emote to current room
 	public void emote(String message) {
 		if(message != null && message.length()>0){
-			currentRoom.messageAllPlayers("\\e[3m*" + name + " " + message + "*\\e[0m");
+			currentRoom.messageAllPlayers("\\033[3m*" + name + " " + message + "*\\033[0m");
 		}
 	}
 }
