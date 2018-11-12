@@ -4,11 +4,17 @@
   "currentRoomID": "spawn",
   "currentStep": 0,
   "routine": [
-  		"wait","wait","wait","wait","wait","wait","wait",
-  		"shout Everybody",
+  		"wait 5",
   		"n",
-  		"me rocks his body right.",
-  		"say Backstreet's back, alright?",
-  		"s"  		
+  		"wait 2",
+  		"me can't stop the beat.",
+  		"wait",
+  		"n",
+  		"say You can't stop the mosean of the ocean, or the sun in the sky.",
+  		"wait 4",
+  		"s",
+  		"me looks around, bored.",
+  		"wait 2",
+  		"s"
   ]
 }

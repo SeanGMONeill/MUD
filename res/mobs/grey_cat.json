@@ -1,0 +1,9 @@
+{
+  "name": "Cat",
+  "startRoomID": "georgest_johnst",
+  "currentRoomID": "georgest_johnst",
+  "currentStep": 0,
+  "routine": [
+  		"wait 5","s", "wait 3", "me meows.", "wait 5", "s", "me purrs.", "wait 4", "n", "wait 6", "me drinks from a puddle.", "wait 2", "n"
+  ]
+}

@@ -7,6 +7,7 @@ public class Mobile extends Entity{
 	int currentStep;
 	Room defaultRoom;
 	List<String> routine;
+	int turnsToWait = 0;
 	
 	
 	public Mobile(String name, Room currentRoom, Room defaultRoom, int currentStep, List<String> routine, Server server) {
@@ -25,12 +26,16 @@ public class Mobile extends Entity{
 	public boolean handleCommand(String input) {
 		String[] splitInput = input.split(" ", 2);
 		String command;
+		String param = ""; 
 		
 		command = splitInput[0].toLowerCase();
+		if(splitInput.length>1) {
+			param = splitInput[1];
+		}
 		
 		switch(command) {
 			case "wait":
-				//do nothing this tick
+				wait(param);
 				break;
 			default:
 				return super.handleCommand(input);
@@ -40,10 +45,29 @@ public class Mobile extends Entity{
 	}
 	
 	public void doTick() {
-		handleCommand(routine.get(currentStep));
-		currentStep++;
-		if(currentStep >= routine.size()) {
-			currentStep = 0;
+		if(turnsToWait > 0) {
+			turnsToWait--;
 		}
+		else {
+			if(routine.size()>0) {
+				handleCommand(routine.get(currentStep));
+				currentStep++;
+				if(currentStep >= routine.size()) {
+					currentStep = 0;
+				}
+			}
+		}
+	}
+	
+	private void wait(String param) {
+		if(param != "") {
+			try {
+				turnsToWait = Integer.parseInt(param)-1;
+			}
+			catch(NumberFormatException e) {
+				
+			}
+		}
+		//Otherwise we're just waiting this 1 tick
 	}
 }
