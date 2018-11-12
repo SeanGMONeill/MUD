@@ -13,6 +13,7 @@ import java.util.Map;
 public class Server {
 
 	final int port = 53490;
+	private boolean serverOnline = true;
 	
 	public static void main(String[] args) throws IOException {
 			
@@ -24,20 +25,29 @@ public class Server {
 	ThreadGroup connections;
 	Map<String, ClientConnection> onlinePlayers;
 	Map<String, Room> rooms;
+	MobManager mobManager;
 	
 	
 	public Server() throws IOException {
 		
-		//Load all rooms before we start letting players join, otherwise they'll all get InvalidRoomExceptions
-		loadAllRooms();
-		
-		//This is the actual socket we're listening on
-		ServerSocket serverSocket = new ServerSocket(port);
-		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownThread(serverSocket, onlinePlayers)));
-		
 		//Keeps track of active players and connections
 		connections = new ThreadGroup("Connections");
 		onlinePlayers = new HashMap<String, ClientConnection>();
+		
+		//Load all rooms before we start letting players join, otherwise they'll all get InvalidRoomExceptions
+		loadAllRooms();
+		
+		//Start all the mobs on their merry way
+		 mobManager = new MobManager(this);
+		 mobManager.loadMobsFromFolder(new File("res/mobs"));
+		 new Thread(mobManager).start();
+		
+		
+		//This is the actual socket we're listening on
+		ServerSocket serverSocket = new ServerSocket(port);
+		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownThread(this, serverSocket, onlinePlayers)));
+		
+
 		
 		//Client socket
 		Socket socket = null;
@@ -46,7 +56,7 @@ public class Server {
 		System.out.println("Server started.");
 	
 		
-		while(true) {
+		while(serverOnline()) {
 			
 			socket = serverSocket.accept();
 			socket.setSoTimeout(60000); //60 second timeout on connect, for logging in.
@@ -54,6 +64,14 @@ public class Server {
 			Thread clientThread = new Thread(connections, clientConn);
 			clientThread.start();
 		}
+	}
+	
+	public Boolean serverOnline() {
+		return serverOnline;
+	}
+	
+	public void setServerOffline() {
+		serverOnline = false;
 	}
 	
 	public Boolean isOnline(String player) {
@@ -70,6 +88,7 @@ public class Server {
 		player = player.toLowerCase();
 		onlinePlayers.remove(player);
 	}
+
 	
 	private void loadAllRooms() {
 		rooms = new HashMap<>();

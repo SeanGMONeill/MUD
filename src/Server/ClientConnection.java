@@ -92,7 +92,7 @@ public class ClientConnection implements Runnable {
 			input = getLoopingInput();
 			
 			if(input != null) {
-				handleCommand(input);
+				player.handleCommand(this, input);
 			}
 			
 			sendStuffToClient();
@@ -117,7 +117,7 @@ public class ClientConnection implements Runnable {
 				out.println("Invalid player name, please try again:");
 				playerName = getLoopingInput();
 				if(playerName != null) {
-					handleCommand(playerName);
+					player.handleCommand(this, playerName);
 				}
 			}
 			catch(CorruptFileException e) {
@@ -238,65 +238,6 @@ public class ClientConnection implements Runnable {
 	public void exitPlayer(String message) {
 		server.messagePlayer(player, message);
 		try { socket.close(); }catch(Exception e) {Server.logError(e);}
-	}
-	
-	private void handleCommand(String input) {
-		String[] splitInput = input.split(" ", 2);
-		String command;
-		String param = ""; 
-		
-		command = splitInput[0].toLowerCase();
-		if(splitInput.length>1) {
-			param = splitInput[1];
-		}
-		
-		switch(command) {
-			case "shout":
-				player.shout(param);
-				break;
-			case "say":
-				player.say(param);
-				break;
-			case "emote":
-			case "me":
-				player.emote(param);
-				break;
-			case "north":
-			case "n":
-				player.move(Position.Direction.NORTH);
-				break;
-			case "south":
-			case "s":
-				player.move(Position.Direction.SOUTH);
-				break;
-			case "east":
-			case "e":
-				player.move(Position.Direction.EAST);
-				break;
-			case "west":
-			case "w":
-				player.move(Position.Direction.WEST);
-				break;
-			case "up":
-			case "u":
-				player.move(Position.Direction.UP);
-				break;
-			case "down":
-			case "d":
-				player.move(Position.Direction.DOWN);
-				break;
-			case "look":
-			case "l":
-				server.messagePlayer(player, player.getRoom().toLongString());
-				break;
-			case "exit":
-				exitPlayer("Thanks for playing!");
-				break;
-				
-			default:
-				out.println("No such command.");
-		}
-		
 	}
 	
 }

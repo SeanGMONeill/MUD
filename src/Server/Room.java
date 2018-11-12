@@ -27,6 +27,7 @@ public class Room {
 	Map<Direction, String> exits;
 	
 	Set<Player> players;
+	Set<Mobile> mobs;
 	
 	Server server;
 	
@@ -62,6 +63,7 @@ public class Room {
 		
 		
 		players = new HashSet<Player>();
+		mobs = new HashSet<Mobile>();
 		this.server = server;
 
 	}
@@ -126,21 +128,31 @@ public class Room {
 		return exitString;
 	}
 	
-	public void enterRoom(Player player) {
-		server.messagePlayer(player, playersToString());
-		messageAllPlayers(player.getName() + " has wandered over.");
-		players.add(player);
-		server.messagePlayer(player, toShortString());
+	public void enterRoom(Entity entity) {
+		messageAllPlayers(entity.getName() + " wanders over.");
+		if(entity instanceof Player) {
+			Player player = (Player)entity;
+			player.message(playersToString());
+			players.add(player);
+			player.message(toShortString());
+		}
+		else if(entity instanceof Mobile) {
+			mobs.add((Mobile)entity);
+		}
 	}
 	
-	public void leaveRoom(Player player) {
-		players.remove(player);
-		if(players.isEmpty()) {
-			saveRoomState();
+	public void leaveRoom(Entity entity) {
+		if(entity instanceof Player) {
+			Player player = (Player)entity;
+			players.remove(player);
+			if(players.isEmpty()) {
+				saveRoomState();
+			}
 		}
-		else {
-			messageAllPlayers(player.getName() + " sauntered away.");
+		else if(entity instanceof Mobile) {
+			mobs.remove((Mobile)entity);
 		}
+		messageAllPlayers(entity.getName() + " saunters away.");
 	}
 	
 	public List<Player> getPlayers(){
@@ -149,7 +161,7 @@ public class Room {
 	
 	public void messageAllPlayers(String message) {
 		for(Player player : getPlayers()) {
-			server.messagePlayer(player, message);
+			player.message(message);
 		}
 	}
 	

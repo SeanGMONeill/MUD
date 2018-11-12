@@ -1,0 +1,14 @@
+{
+  "name": "Town Crier",
+  "startRoomID": "spawn",
+  "currentRoomID": "spawn",
+  "currentStep": 0,
+  "routine": [
+  		"wait","wait","wait","wait","wait","wait","wait",
+  		"shout Everybody",
+  		"n",
+  		"me rocks his body right.",
+  		"say Backstreet's back, alright?",
+  		"s"  		
+  ]
+}
