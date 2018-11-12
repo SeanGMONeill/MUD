@@ -33,4 +33,9 @@ public class TextUtils {
 		return listString;
 	}
 	
+	
+	public static String removeNonAlphabet(String input) {
+		String output = input.replaceAll("[^a-zA-Z]", "");
+		return output;
+	}
 }

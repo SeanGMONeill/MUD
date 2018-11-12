@@ -55,7 +55,7 @@ public class ClientConnection implements Runnable {
 		
 		out.println("Please tell me your player name");
 		
-		String input = promptPlayerName();
+		String input = TextUtils.removeNonAlphabet(promptPlayerName());
 		
 		if(input == null) {
 			//Abort thread, we've already disconnected the user.
